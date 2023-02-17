@@ -7,7 +7,7 @@ export class ProfileService {
   profiles: Profile[] = [];
 
   findAll() {
-    return 'Buscar todos os perfis';
+    return this.profiles;
   }
   create(createProfileDto: CreateProfileDto) {
     const profile: Profile = { id: 'random_id', ...createProfileDto };
