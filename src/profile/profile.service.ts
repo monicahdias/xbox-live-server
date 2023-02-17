@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -12,8 +13,14 @@ export class ProfileService {
     return this.prisma.profile.findMany();
   }
 
-  findOne(id: string): Promise<Profile> {
-    return this.prisma.profile.findUnique({ where: { id } });
+  async findOne(id: string): Promise<Profile> {
+    const record = await this.prisma.profile.findUnique({ where: { id } });
+
+    if (!record) {
+      throw new NotFoundException(`Registro com ID [${id}] não encontrado.`);
+    }
+
+    return record;
   }
 
   create(dto: CreateProfileDto): Promise<Profile> {
