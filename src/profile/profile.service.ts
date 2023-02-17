@@ -40,6 +40,7 @@ export class ProfileService {
   }
 
   async delete(id: string) {
+    await this.findById(id);
     await this.prisma.profile.delete({ where: { id } });
   }
 }
