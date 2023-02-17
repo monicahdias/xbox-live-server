@@ -3,16 +3,19 @@ import {
   Get,
   Post,
 } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { ProfileService } from './profile.service';
 
 @Controller('profile')
 export class ProfileController {
+  constructor(private profileService: ProfileService) {}
+
   @Get()
   findAll() {
-    return 'Buscar todos os perfis';
+    return this.profileService.findAll();
   }
 
   @Post()
   create() {
-    return 'Criar um perfil';
+    return this.profileService.create();
   }
 }
