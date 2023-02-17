@@ -7,10 +7,15 @@ import { Profile } from './entities/profile.entity';
 export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
+  findAll(): Promise<Profile[]> {
     return this.prisma.profile.findMany();
   }
-  create(dto: CreateProfileDto) {
+
+  findOne(id: string): Promise<Profile> {
+    return this.prisma.profile.findUnique({ where: { id } });
+  }
+
+  create(dto: CreateProfileDto): Promise<Profile> {
     const data: Profile = { ...dto };
 
     return this.prisma.profile.create({ data });
