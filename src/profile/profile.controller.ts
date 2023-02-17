@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common/decorators/core/controller.decorator';
 import {
   Get,
+  Patch,
   Post,
 } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
@@ -9,6 +10,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { Profile } from './entities/profile.entity';
 import { ProfileService } from './profile.service';
 import { Param } from '@nestjs/common';
+import { UpdateProfileDto } from './dto/update-profile-dto';
 
 @ApiTags('profile')
 @Controller('profile')
@@ -31,5 +33,14 @@ export class ProfileController {
   @ApiOperation({ summary: 'Criar um perfil' })
   create(@Body() dto: CreateProfileDto): Promise<Profile> {
     return this.profileService.create(dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Editar um perfil' })
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProfileDto,
+  ): Promise<Profile> {
+    return this.profileService.update(id, dto);
   }
 }
