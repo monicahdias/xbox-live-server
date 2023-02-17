@@ -11,7 +11,7 @@ import { ProfileService } from './profile.service';
 @ApiTags('profile')
 @Controller('profile')
 export class ProfileController {
-  constructor(private profileService: ProfileService) {}
+  constructor(private readonly profileService: ProfileService) {}
 
   @Get()
   findAll() {
@@ -19,7 +19,7 @@ export class ProfileController {
   }
 
   @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  create(@Body() dto: CreateProfileDto) {
+    return this.profileService.create(dto);
   }
 }
