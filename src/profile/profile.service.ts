@@ -26,4 +26,8 @@ export class ProfileService {
     const data: Partial<Profile> = { ...dto };
     return this.prisma.profile.update({ where: { id }, data });
   }
+
+  async delete(id: string) {
+    await this.prisma.profile.delete({ where: { id } });
+  }
 }

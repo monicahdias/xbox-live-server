@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common/decorators/core/controller.decorator';
 import {
+  Delete,
   Get,
   Patch,
   Post,
@@ -9,7 +10,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger/dist/decorators';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { Profile } from './entities/profile.entity';
 import { ProfileService } from './profile.service';
-import { Param } from '@nestjs/common';
+import { HttpCode, HttpStatus, Param } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile-dto';
 
 @ApiTags('profile')
@@ -42,5 +43,12 @@ export class ProfileController {
     @Body() dto: UpdateProfileDto,
   ): Promise<Profile> {
     return this.profileService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remover um perfil' })
+  delete(@Param('id') id: string) {
+    this.profileService.delete(id);
   }
 }
