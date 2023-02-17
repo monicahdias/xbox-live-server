@@ -3,6 +3,8 @@ import {
   Get,
   Post,
 } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
+import { CreateProfileDto } from './dto/create-profile.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profile')
@@ -15,7 +17,7 @@ export class ProfileController {
   }
 
   @Post()
-  create() {
-    return this.profileService.create();
+  create(@Body() createProfileDto: CreateProfileDto) {
+    return this.profileService.create(createProfileDto);
   }
 }
