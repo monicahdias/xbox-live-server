@@ -37,7 +37,7 @@ export class ProfileController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Editar um perfil' })
+  @ApiOperation({ summary: 'Editar um perfil pelo ID' })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateProfileDto,
@@ -47,7 +47,7 @@ export class ProfileController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remover um perfil' })
+  @ApiOperation({ summary: 'Remover um perfil pelo ID' })
   delete(@Param('id') id: string) {
     this.profileService.delete(id);
   }
