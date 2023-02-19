@@ -1,44 +1,60 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { User } from './entities/user.entity';
 
-@ApiTags('user')
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Injectable()
+export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  findAll(): Promise<User[]> {
+    return this.prisma.user.findMany();
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findById(id: string): Promise<User> {
+    const record = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!record) {
+      throw new NotFoundException(`Registro com ID [${id}] não encontrado.`);
+    }
+
+    return record;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(id: string): Promise<User> {
+    return this.findById(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  create(dto: CreateUserDto): Promise<User> {
+    const data: User = { ...dto };
+
+    return this.prisma.user.create({ data }).catch(this.handleError);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    await this.findById(id);
+    const data: Partial<User> = { ...dto };
+    return this.prisma.user
+      .update({ where: { id }, data })
+      .catch(this.handleError);
+  }
+
+  async delete(id: string) {
+    await this.findById(id);
+    await this.prisma.user.delete({ where: { id } });
+  }
+
+  handleError(error: Error): undefined {
+    const errorLines = error.message?.split('\n');
+    const lastErrorLine = errorLines[errorLines.length - 1]?.trim();
+    throw (
+      new UnprocessableEntityException(lastErrorLine) ||
+      'Algum erro ocorreu ao executar a operação'
+    );
   }
 }
