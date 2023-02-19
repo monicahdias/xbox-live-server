@@ -1,60 +1,52 @@
 import {
-  NotFoundException,
-  UnprocessableEntityException,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Injectable()
-export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+@ApiTags('user')
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
-  findAll(): Promise<User[]> {
-    return this.prisma.user.findMany();
+  @Get()
+  @ApiOperation({ summary: 'Listar todos os usuários' })
+  findAll() {
+    return this.userService.findAll();
   }
 
-  async findById(id: string): Promise<User> {
-    const record = await this.prisma.user.findUnique({ where: { id } });
-
-    if (!record) {
-      throw new NotFoundException(`Registro com ID [${id}] não encontrado.`);
-    }
-
-    return record;
+  @Post()
+  @ApiOperation({ summary: 'Criar um usuário' })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
-  async findOne(id: string): Promise<User> {
-    return this.findById(id);
+  @Get(':id')
+  @ApiOperation({ summary: 'Visualizar um usuário pelo ID' })
+  findOne(@Param('id') id: string) {
+    return this.userService.findOne(id);
   }
 
-  create(dto: CreateUserDto): Promise<User> {
-    const data: User = { ...dto };
-
-    return this.prisma.user.create({ data }).catch(this.handleError);
+  @Patch(':id')
+  @ApiOperation({ summary: 'Editar um usuário pelo ID' })
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(id, updateUserDto);
   }
 
-  async update(id: string, dto: UpdateUserDto): Promise<User> {
-    await this.findById(id);
-    const data: Partial<User> = { ...dto };
-    return this.prisma.user
-      .update({ where: { id }, data })
-      .catch(this.handleError);
-  }
-
-  async delete(id: string) {
-    await this.findById(id);
-    await this.prisma.user.delete({ where: { id } });
-  }
-
-  handleError(error: Error): undefined {
-    const errorLines = error.message?.split('\n');
-    const lastErrorLine = errorLines[errorLines.length - 1]?.trim();
-    throw (
-      new UnprocessableEntityException(lastErrorLine) ||
-      'Algum erro ocorreu ao executar a operação'
-    );
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remover um usuário pelo ID' })
+  delete(@Param('id') id: string) {
+    return this.userService.delete(id);
   }
 }
