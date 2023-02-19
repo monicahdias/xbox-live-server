@@ -49,7 +49,7 @@ export class CreateUserDto {
   @IsBoolean()
   @ApiProperty({
     description: 'O usuário é/não é administrador',
-    example: 'Yes/No',
+    example: 'true/false',
   })
   isAdmin: boolean;
 }
