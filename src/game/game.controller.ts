@@ -31,20 +31,20 @@ export class GameController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Visualizar um jogo' })
+  @ApiOperation({ summary: 'Visualizar um jogo pelo ID' })
   findOne(@Param('id') id: string) {
     return this.gameService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Editar um jogo' })
+  @ApiOperation({ summary: 'Editar um jogo pelo ID' })
   update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
     return this.gameService.update(id, updateGameDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remover um jogo' })
+  @ApiOperation({ summary: 'Remover um jogo pelo ID' })
   delete(@Param('id') id: string) {
     this.gameService.delete(id);
   }
