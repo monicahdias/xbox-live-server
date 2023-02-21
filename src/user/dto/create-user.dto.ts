@@ -45,7 +45,7 @@ export class CreateUserDto {
   @MaxLength(11)
   @ApiProperty({
     description: 'Número do CPF do usuário',
-    example: 1234567890,
+    example: 12345678900,
   })
   cpf: string;
 
