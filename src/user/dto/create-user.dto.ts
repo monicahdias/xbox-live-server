@@ -40,7 +40,7 @@ export class CreateUserDto {
   })
   confirmPassword: string;
 
-  @IsNumber()
+  @IsString()
   @MinLength(11)
   @MaxLength(11)
   @ApiProperty({
