@@ -1,6 +1,6 @@
 import { IsNumber, IsUrl } from '@nestjs/class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsPositive, IsString } from 'class-validator';
 
 export class CreateGameDto {
   @IsString()
@@ -26,6 +26,7 @@ export class CreateGameDto {
   description: string;
 
   @IsNumber()
+  @IsPositive()
   @ApiProperty({
     description: 'Ano de lançamento do jogo',
     example: 2020,
@@ -35,6 +36,7 @@ export class CreateGameDto {
   @IsNumber({
     maxDecimalPlaces: 2,
   })
+  @IsPositive()
   @ApiProperty({
     description: 'Nota do IMDb do jogo',
     example: 4.98,
@@ -54,4 +56,11 @@ export class CreateGameDto {
     example: 'https://www.youtube.com/watch?v=gRqddeZDNyM',
   })
   gameplayYouTubeUrl: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'Gênero do jogo',
+    example: 'FPS',
+  })
+  genreName: string;
 }

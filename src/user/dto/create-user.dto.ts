@@ -3,6 +3,7 @@ import {
   IsNumber,
   IsString,
   Matches,
+  MaxLength,
   MinLength,
 } from '@nestjs/class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -40,16 +41,18 @@ export class CreateUserDto {
   confirmPassword: string;
 
   @IsNumber()
+  @MinLength(11)
+  @MaxLength(11)
   @ApiProperty({
     description: 'Número do CPF do usuário',
     example: 1234567890,
   })
-  cpf: number;
+  cpf: string;
 
   @IsBoolean()
   @ApiProperty({
     description: 'O usuário é/não é administrador',
-    example: 'true/false',
+    example: 'false',
   })
   isAdmin: boolean;
 }

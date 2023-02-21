@@ -1,54 +1,86 @@
-import { Controller } from '@nestjs/common/decorators/core/controller.decorator';
 import {
-  Delete,
+  Controller,
   Get,
-  Patch,
   Post,
-} from '@nestjs/common/decorators/http/request-mapping.decorator';
-import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
-import { ApiOperation, ApiTags } from '@nestjs/swagger/dist/decorators';
-import { CreateProfileDto } from './dto/create-profile.dto';
-import { Profile } from './entities/profile.entity';
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { HttpCode, HttpStatus, Param } from '@nestjs/common';
-import { UpdateProfileDto } from './dto/update-profile-dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { LoggedUser } from 'src/auth/logged-user.decorator';
+import { User } from '@prisma/client';
 
 @ApiTags('profile')
+@UseGuards(AuthGuard())
+@ApiBearerAuth()
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
+  @Post()
+  @ApiOperation({
+    summary: 'Create a new profile',
+  })
+  create(@LoggedUser() user: User, @Body() createProfileDto: CreateProfileDto) {
+    return this.profileService.create(user.id, createProfileDto);
+  }
+
   @Get()
-  @ApiOperation({ summary: 'Listar todos os perfis' })
-  findAll(): Promise<Profile[]> {
+  @ApiOperation({
+    summary: 'Find all profiles',
+  })
+  findAll() {
     return this.profileService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Visualizar um perfil' })
-  findOne(@Param('id') id: string): Promise<Profile> {
+  @ApiOperation({
+    summary: 'Find a profile by ID',
+  })
+  findOne(@Param('id') id: string) {
     return this.profileService.findOne(id);
   }
 
-  @Post()
-  @ApiOperation({ summary: 'Criar um perfil' })
-  create(@Body() dto: CreateProfileDto): Promise<Profile> {
-    return this.profileService.create(dto);
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Update a profile by ID',
+  })
+  update(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.update(user.id, id, updateProfileDto);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Editar um perfil pelo ID' })
-  update(
+  @Patch('favoriteGame/:id')
+  @ApiOperation({
+    summary: 'Add a favorite game to a profile',
+  })
+  updateFavorite(
     @Param('id') id: string,
-    @Body() dto: UpdateProfileDto,
-  ): Promise<Profile> {
-    return this.profileService.update(id, dto);
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.addOrRemoveFavoriteGame(
+      id,
+      updateProfileDto.favoriteGameId,
+    );
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remover um perfil pelo ID' })
-  delete(@Param('id') id: string) {
-    this.profileService.delete(id);
+  @ApiOperation({
+    summary: 'Delete a profile by ID',
+  })
+  delete(@LoggedUser() user: User, @Param('id') id: string) {
+    return this.profileService.delete(user.id, id);
   }
 }

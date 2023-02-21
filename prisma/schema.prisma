@@ -12,8 +12,10 @@ model User {
   name     String
   email    String  @unique
   password String
-  cpf      Int     @unique
-  isAdmin  Boolean @map("is_admin")
+  cpf      String  @unique
+  isAdmin  Boolean @default(false) @map("is_admin")
+
+  profiles Profile[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -25,6 +27,12 @@ model Profile {
   id       String @id @default(uuid())
   title    String @unique
   imageUrl String @map("image_url")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  games         Game[]
+  favoriteGames FavoriteGame?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -42,6 +50,10 @@ model Game {
   trailerYouTubeUrl  String @map("trailer_you_tube_url")
   gameplayYouTubeUrl String @map("gameplay_you_tube_url")
 
+  favoriteGames FavoriteGame[]
+  profiles      Profile[]
+  genres        Genre[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -52,8 +64,19 @@ model Genre {
   id   String @id @default(uuid())
   name String @unique
 
+  games Game[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("genre")
+}
+
+model FavoriteGame {
+  id        String  @id @default(uuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String  @unique @map("profile_id")
+  games     Game[]
+
+  @@map("profile_game")
 }
